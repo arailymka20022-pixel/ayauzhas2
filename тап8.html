@@ -1,0 +1,42 @@
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+fetch('../data/products.json')
+    .then(res => res.json())
+    .then(products => {
+        displayCart(products);
+    });
+
+function displayCart(products) {
+    const container = document.getElementById('cart');
+    container.innerHTML = '';
+
+    let total = 0;
+
+    cart.forEach(item => {
+        const product = products.find(p => p.id === item.id);
+        const sum = product.price * item.qty;
+        total += sum;
+
+        container.innerHTML += `
+            <div>
+                <h3>${product.name}</h3>
+                <p>${item.qty} x ${product.price}</p>
+                <button onclick="remove(${item.id})">Удалить</button>
+            </div>
+        `;
+    });
+
+    document.getElementById('total').innerText = 'Итого: ' + total + ' тг';
+}
+
+function remove(id) {
+    cart = cart.filter(i => i.id !== id);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    location.reload();
+}
+
+function checkout() {
+    localStorage.removeItem('cart');
+    alert('Заказ оформлен!');
+    location.reload();
+}
